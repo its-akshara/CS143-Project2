@@ -88,11 +88,11 @@ private[sql] class DiskPartition (
         {
           spillPartitionToDisk()
           data.clear()
+          // writtenToDisk = true
         }
-        else
-        {
+
           data.add(row)
-        }
+
       }
     else
       {
