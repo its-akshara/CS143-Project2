@@ -171,7 +171,7 @@ private[sql] class DiskPartition (
         */
       private[this] def fetchNextChunk(): Boolean = {
         /* IMPLEMENT THIS METHOD */
-        if(chunkSizeIterator.hasNext==false)
+        if(!chunkSizeIterator.hasNext)
           {
             return false
           }
@@ -198,9 +198,10 @@ private[sql] class DiskPartition (
     if(data.size()>0)
       {
         spillPartitionToDisk()
+        data.clear()
       }
 
-    // inStream.close()
+    // inStream.close() don't know why this causes issues :/
     outStream.close()
     inputClosed = true
   }
