@@ -80,6 +80,24 @@ private[sql] class DiskPartition (
     */
   def insert(row: Row) = {
     /* IMPLEMENT THIS METHOD */
+
+    if(!inputClosed)
+      {
+
+        if(measurePartitionSize()>blockSize)
+        {
+          spillPartitionToDisk()
+          data.clear()
+        }
+        else
+        {
+          data.add(row)
+        }
+      }
+    else
+      {
+        throw new SparkException("Cannot insert row when the input is closed!")
+      }
   }
 
   /**
@@ -123,12 +141,26 @@ private[sql] class DiskPartition (
 
       override def next() = {
         /* IMPLEMENT THIS METHOD */
-        null
+        if(hasNext())
+          {
+            currentIterator.next()
+          }
+        else
+        {
+          throw new SparkException("There is no next iterator!")
+        }
       }
 
       override def hasNext() = {
         /* IMPLEMENT THIS METHOD */
-        false
+        if(currentIterator.hasNext || fetchNextChunk())
+        {
+          true
+        }
+        else
+        {
+          false
+        }
       }
 
       /**
@@ -139,7 +171,16 @@ private[sql] class DiskPartition (
         */
       private[this] def fetchNextChunk(): Boolean = {
         /* IMPLEMENT THIS METHOD */
-        false
+        if(chunkSizeIterator.hasNext==false)
+          {
+            return false
+          }
+        else
+        {
+            byteArray = CS143Utils.getNextChunkBytes(inStream,chunkSizeIterator.next(),byteArray)
+            currentIterator = CS143Utils.getListFromBytes(byteArray).iterator.asScala
+        }
+        true
       }
     }
   }
@@ -159,7 +200,7 @@ private[sql] class DiskPartition (
         spillPartitionToDisk()
       }
 
-    inStream.close()
+    // inStream.close()
     outStream.close()
     inputClosed = true
   }
