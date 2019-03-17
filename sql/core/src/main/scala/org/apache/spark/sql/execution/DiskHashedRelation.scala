@@ -153,6 +153,14 @@ private[sql] class DiskPartition (
     */
   def closeInput() = {
     /* IMPLEMENT THIS METHOD */
+
+    if(data.size()>0)
+      {
+        spillPartitionToDisk()
+      }
+
+    inStream.close()
+    outStream.close()
     inputClosed = true
   }
 
