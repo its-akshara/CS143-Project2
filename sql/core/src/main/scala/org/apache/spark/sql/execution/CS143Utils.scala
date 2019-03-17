@@ -129,6 +129,14 @@ object CS143Utils {
     */
   def getUdfFromExpressions(expressions: Seq[Expression]): ScalaUdf = {
     /* IMPLEMENT THIS METHOD */
+
+    for(e <- expressions.reverse)
+      {
+        if(e.getClass == ScalaUdf)
+        {
+           e
+        }
+      }
     null
   }
 
