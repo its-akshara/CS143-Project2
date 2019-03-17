@@ -132,9 +132,16 @@ object CS143Utils {
 
     for(e <- expressions.reverse)
       {
-        if(e.getClass == ScalaUdf)
-        {
-           e
+ //        if(e.getClass == ScalaUdf)
+ //        {
+ //           e
+ //        }
+        e match
+          {
+          case s: ScalaUdf =>
+              {
+                  return s
+              }
         }
       }
     null
@@ -233,12 +240,35 @@ object CachingIteratorGenerator {
 
       def hasNext() = {
         /* IMPLEMENT THIS METHOD */
-        false
+        input.hasNext
       }
 
       def next() = {
         /* IMPLEMENT THIS METHOD */
-        null
+        if(hasNext()==false)
+          {
+            null
+          }
+        else
+          {
+            val r = input.next()
+            val key = cacheKeyProjection.apply(r)
+            val pre = preUdfProjection.apply(r)
+            val post = postUdfProjection.apply(r)
+            var curr : Row = null
+            if(cache.containsKey(key))
+              {
+                curr = cache.get(key)
+              }
+            else
+              {
+                curr = udfProject.apply(r)
+                cache.put(key,curr)
+              }
+
+            Row.fromSeq(pre++curr++post)
+          }
+
       }
     }
   }
