@@ -290,13 +290,13 @@ object AggregateIteratorGenerator {
       val postAggregateProjection = CS143Utils.getNewProjection(resultExpressions, inputSchema)
 
       def hasNext() = {
-        /* IMPLEMENT THIS METHOD */
-        false
+        input.hasNext
       }
 
       def next() = {
-        /* IMPLEMENT THIS METHOD */
-        null
+        val input_next = input.next
+
+        postAggregateProjection(new JoinedRow(new GenericRow(Array(input_next._2.eval())), input_next._1))
       }
     }
   }
